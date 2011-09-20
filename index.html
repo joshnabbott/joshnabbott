@@ -57,8 +57,28 @@
     <script language="Javascript" type="text/javascript">
       google.load("jquery", "1.6.4");
 
+      function loadConsole() {
+        input = document.createElement('input', { 'type' : 'text', 'name' : 'console', 'id' : 'console' });
+
+        $(input).css({
+          'background-color': 'transparent',
+          'border-width': 0,
+          'color': '#cacaca',
+          'font-family': 'inherit',
+          'height': $('body').height(),
+          'width': $('body').width()
+        });
+        $(input).val("Please type a command");
+
+        $('body').html(input);
+        $(input).focus();
+      }
+
       google.setOnLoadCallback(function() {
-        // Add onload callbacks here
+        $('body').click(function() {
+          console.log("Loading console...");
+          loadConsole();
+        })
       });
     </script>
   </body>
