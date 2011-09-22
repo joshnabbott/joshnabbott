@@ -7,35 +7,90 @@
 
     <title>&#114;&#51;&#115;&#99;&#117;&#51;&#32;&#110;&#49;&#108;</title>
 
-    <style type="text/css">
-      @font-face {
-        font-family: "Pet Me 2Y";
-        src: url('public/fonts/PetMe2Y.ttf') format("truetype");
+    <link href='public/stylesheets/application.css' rel='stylesheet' type='text/css' />
+  </head>
+
+  <body>
+    <p>&#77;&#121;&#32;&#110;&#97;&#109;&#101;&#32;&#105;&#115;&#32;&#74;&#111;&#115;&#104;&#32;&#97;&#110;&#100;&#32;&#73;&#32;&#119;&#114;&#105;&#116;&#101;&#32;&#99;&#48;&#100;&#101;&#95;</p>
+
+    <script src="https://www.google.com/jsapi?key=ABQIAAAA6J61Q3NRyblMhP3tunXx5hTXuNJYgRCXxXyfp1wdeUAv4V3EdRSFj_sLW3Z0FtNmgKImSzYeTliOpg" type="text/javascript"></script>
+    <script language="Javascript" type="text/javascript">
+      google.load("jquery", "1.6.4");
+      // Load application.js
+      document.write(unescape('%3Cscript src="public/javascripts/jquery.jsonp-2.1.4.min.js"%3E%3C/script%3E'))
+
+      function unloadConsole() {
+        $('body').html(window.localStorage.getItem('originalContent'));
       }
 
-      html {
-        height: 100%;
-        overflow: hidden;
-        width: 100%;
+      function loadConsole() {
+        // Save original content of page for wheneconsole needs to be quit
+        window.localStorage.setItem('originalContent', $('body').html());
+
+        var input = $('<input></input>', { 'type' : 'text', 'name' : 'console', 'id' : 'console' });
+        var viewer = $('<span></span>', { 'id': 'console-viewer' });
+
+        input.css({
+          'background-color' : 'transparent',
+          'border-width'     : 0,
+          'color'            : '#cacaca',
+          'display'          : 'table-cell',
+          'font-family'      : 'inherit',
+          'height'           : '14px',
+          'vertical-align'   : 'middle',
+          'width'            : '100%'
+        });
+
+        $('body').html(input);
+        $('body').prepend(viewer);
+
+        $(input).focus();
+
+        $(document).bind('keypress', function(event) {
+          if(event.keyCode == 27) {
+            // esc was pressed
+            unloadConsole();
+          } else if(event.keyCode == 13) {
+            // Submit user input and see what happens
+            if(input.val()) {
+              submitQuery();
+            } else {
+              return false;
+              }
+          } else {
+            console.log(event.keyCode);
+          }
+        })
       }
 
-      body {
-        background-color: #111;
-        color: #cacaca;
-        display: table;
-        font-family: "Pet Me 2Y";
-        height: 100%;
-        width: 100%;
+      function submitQuery(message) {
+        var $console = $('#console');
+
+        // PandoraBots stuff
+        var uri = 'http://localhost:4567/';
+        var botid = 'ff62f374fe343f73';
+
+        $('#console-viewer').append('<pre>&#8658; ' + $console.val() + '\n</pre>');
+        console.log("Submitting query...");
+
+        $.ajax({
+          type: "POST",
+          url: uri,
+          data: { 'botid': botid, 'message': message },
+          success: function(data) {
+            console.log(data);
+          }
+        });
       }
 
-      body p {
-        display: table-cell;
-        text-align: center;
-        vertical-align: middle;
-      }
-    </style>
+      google.setOnLoadCallback(function() {
+        $('body').click(function() {
+          console.log("Loading console...");
+          loadConsole();
+        })
+      });
 
-    <script type="text/javascript">
+      // Analytics
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-25548735-1']);
       _gaq.push(['_setDomainName', 'none']);
@@ -47,58 +102,6 @@
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
-    </script>
-  </head>
-
-  <body>
-    <p>&#77;&#121;&#32;&#110;&#97;&#109;&#101;&#32;&#105;&#115;&#32;&#74;&#111;&#115;&#104;&#32;&#97;&#110;&#100;&#32;&#73;&#32;&#119;&#114;&#105;&#116;&#101;&#32;&#99;&#48;&#100;&#101;&#95;</p>
-
-    <script src="https://www.google.com/jsapi?key=ABQIAAAA6J61Q3NRyblMhP3tunXx5hTXuNJYgRCXxXyfp1wdeUAv4V3EdRSFj_sLW3Z0FtNmgKImSzYeTliOpg" type="text/javascript"></script>
-    <script language="Javascript" type="text/javascript">
-      google.load("jquery", "1.6.4");
-
-      function unloadConsole() {
-        $('body').html(window.localStorage.getItem('originalContent'));
-      }
-
-      function loadConsole() {
-        input = document.createElement('input', { 'type' : 'text', 'name' : 'console', 'id' : 'console' });
-
-        $(input).css({
-          'background-color': 'transparent',
-          'border-width': 0,
-          'color': '#cacaca',
-          'display': 'table-cell',
-          'font-family': 'inherit',
-          'height': '14px',
-          'vertical-align': 'middle',
-          'width': '100%'
-        });
-
-        // Save original content of page in case console needs to be quit
-        window.localStorage.setItem('originalContent', $('body').html());
-
-        $('body').html(input);
-
-        $(input).focus();
-
-        $(document).bind('keypress', function(event) {
-          if(event.keyCode == 27) {
-            // esc was pressed
-            unloadConsole();
-          } else {
-            // Submit user input and see what happens
-            return submitQuery();
-          }
-        })
-      }
-
-      google.setOnLoadCallback(function() {
-        $('body').click(function() {
-          console.log("Loading console...");
-          loadConsole();
-        })
-      });
     </script>
   </body>
 </html>
