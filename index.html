@@ -5,9 +5,43 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-    <title>&#114;&#51;&#115;&#99;&#117;&#51;&#32;&#110;&#49;&#108;</title>
+    <title>&#77;&#121;&#32;&#110;&#97;&#109;&#101;&#32;&#105;&#115;&#32;&#74;&#111;&#115;&#104;&#46;</title>
 
-    <link href='public/stylesheets/application.css' rel='stylesheet' type='text/css' />
+    <style type="text/css">
+      @font-face {
+        font-family: "Pet Me 2Y";
+        src: url('../fonts/PetMe2Y.ttf') format("truetype");
+      }
+
+      html {
+        height: 100%;
+        overflow: hidden;
+        width: 100%;
+      }
+
+      body {
+        background-color: #111;
+        color: #cacaca;
+        display: table;
+        font-family: "Pet Me 2Y";
+        height: 100%;
+        width: 100%;
+      }
+
+      body p {
+        display: table-cell;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      body span pre {
+        line-height: 100%;
+      }
+
+      input:focus {
+        outline: none;
+      }
+    </style>
   </head>
 
   <body>
@@ -16,14 +50,24 @@
     <script src="https://www.google.com/jsapi?key=ABQIAAAA6J61Q3NRyblMhP3tunXx5hTXuNJYgRCXxXyfp1wdeUAv4V3EdRSFj_sLW3Z0FtNmgKImSzYeTliOpg" type="text/javascript"></script>
     <script language="Javascript" type="text/javascript">
       google.load("jquery", "1.6.4");
-      // Load application.js
-      document.write(unescape('%3Cscript src="public/javascripts/jquery.jsonp-2.1.4.min.js"%3E%3C/script%3E'))
+
+      var consoleLoaded = false;
+      // PandoraBots stuff
+      var uri = 'http://localhost:4567/';
+      var botid = 'ff62f374fe343f73';
+      var custid = '';
+
 
       function unloadConsole() {
         $('body').html(window.localStorage.getItem('originalContent'));
+        consoleLoaded = false;
       }
 
       function loadConsole() {
+        if(consoleLoaded) return false;
+
+        console.log("Loading console...");
+
         // Save original content of page for wheneconsole needs to be quit
         window.localStorage.setItem('originalContent', $('body').html());
 
@@ -46,7 +90,7 @@
 
         $(input).focus();
 
-        $(document).bind('keypress', function(event) {
+        $(document).bind('keyup', function(event) {
           if(event.keyCode == 27) {
             // esc was pressed
             unloadConsole();
@@ -58,9 +102,10 @@
               return false;
               }
           } else {
-            console.log(event.keyCode);
+            // Maybe do something here?
           }
         })
+        consoleLoaded = true;
       }
 
       function submitQuery(message) {
@@ -68,20 +113,18 @@
 
         var $console = $('#console');
         var $console_viewer = $('#console-viewer');
+
         $console_viewer.append('<pre>&#8658; ' + $console.val() + '\n</pre>');
         $console.val('');
-
-        // PandoraBots stuff
-        var uri = 'http://localhost:4567/';
-        var botid = 'ff62f374fe343f73';
 
         $.ajax({
           url: "http://localhost:4567",
           dataType: 'json',
-          data: { 'botid': botid, 'message': message },
+          data: { 'botid': botid, 'message': message, 'custid': custid },
           success: function(data) {
             console.log(data);
             $console_viewer.append('<pre>' + data.result.that + '\n</pre>');
+            custid = data.result.custid;
           },
           error: function(description, message) {
             console.log('An error occurred: ' + description + ': ' + message);
@@ -91,8 +134,11 @@
 
       google.setOnLoadCallback(function() {
         $('body').click(function() {
-          console.log("Loading console...");
-          loadConsole();
+          if(consoleLoaded) {
+            $('#console').focus();
+          } else {
+            loadConsole();
+          }
         })
       });
 
