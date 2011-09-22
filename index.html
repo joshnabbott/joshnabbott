@@ -53,7 +53,7 @@
           } else if(event.keyCode == 13) {
             // Submit user input and see what happens
             if(input.val()) {
-              submitQuery();
+              submitQuery(input.val());
             } else {
               return false;
               }
@@ -64,21 +64,27 @@
       }
 
       function submitQuery(message) {
+        console.log("Submitting query...");
+
         var $console = $('#console');
+        var $console_viewer = $('#console-viewer');
+        $console_viewer.append('<pre>&#8658; ' + $console.val() + '\n</pre>');
+        $console.val('');
 
         // PandoraBots stuff
         var uri = 'http://localhost:4567/';
         var botid = 'ff62f374fe343f73';
 
-        $('#console-viewer').append('<pre>&#8658; ' + $console.val() + '\n</pre>');
-        console.log("Submitting query...");
-
         $.ajax({
-          type: "POST",
-          url: uri,
+          url: "http://localhost:4567",
+          dataType: 'json',
           data: { 'botid': botid, 'message': message },
           success: function(data) {
             console.log(data);
+            $console_viewer.append('<pre>' + data.result.that + '\n</pre>');
+          },
+          error: function(description, message) {
+            console.log('An error occurred: ' + description + ': ' + message);
           }
         });
       }
