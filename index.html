@@ -5,12 +5,12 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-    <title>&#114;&#51;&#115;&#99;&#117;&#51;&#32;&#110;&#49;&#108;</title>
+    <title>&#77;&#121;&#32;&#110;&#97;&#109;&#101;&#32;&#105;&#115;&#32;&#74;&#111;&#115;&#104;&#46;</title>
 
     <style type="text/css">
       @font-face {
         font-family: "Pet Me 2Y";
-        src: url('public/fonts/PetMe2Y.ttf') format("truetype");
+        src: url('../fonts/PetMe2Y.ttf') format("truetype");
       }
 
       html {
@@ -33,9 +33,132 @@
         text-align: center;
         vertical-align: middle;
       }
-    </style>
 
-    <script type="text/javascript">
+      #console-viewer {
+        height: 50%;
+        overflow-y: auto;
+      }
+
+      #console-viewer pre {
+        line-height: 100%;
+      }
+
+      input:focus {
+        outline: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p>&#77;&#121;&#32;&#110;&#97;&#109;&#101;&#32;&#105;&#115;&#32;&#74;&#111;&#115;&#104;&#32;&#97;&#110;&#100;&#32;&#73;&#32;&#119;&#114;&#105;&#116;&#101;&#32;&#99;&#48;&#100;&#101;&#95;</p>
+
+    <script src="https://www.google.com/jsapi?key=ABQIAAAA6J61Q3NRyblMhP3tunXx5hTXuNJYgRCXxXyfp1wdeUAv4V3EdRSFj_sLW3Z0FtNmgKImSzYeTliOpg" type="text/javascript"></script>
+    <script language="Javascript" type="text/javascript">
+      google.load("jquery", "1.6.4");
+
+      var consoleLoaded = false;
+      // PandoraBots stuff
+      var uri = 'http://localhost:4567/';
+      var botid = 'ff62f374fe343f73';
+      var custid = '';
+
+
+      function unloadConsole() {
+        $('body').html(window.localStorage.getItem('originalContent'));
+        consoleLoaded = false;
+      }
+
+      function loadConsole() {
+        if(consoleLoaded) return false;
+
+        console.log("Loading console...");
+
+        // Save original content of page for wheneconsole needs to be quit
+        window.localStorage.setItem('originalContent', $('body').html());
+
+        var input = $('<input></input>', { 'type' : 'text', 'name' : 'console', 'id' : 'console' });
+        var viewer = $('<div></div>', { 'id': 'console-viewer' });
+
+        input.css({
+          'background-color' : 'transparent',
+          'border-width'     : 0,
+          'color'            : '#cacaca',
+          'display'          : 'table-cell',
+          'font-family'      : 'inherit',
+          'font-size'        : '14px',
+          'height'           : '14px',
+          'vertical-align'   : 'middle',
+          'width'            : '100%'
+        });
+
+        $('body').html(input);
+        $('body').prepend(viewer);
+
+        $(input).focus();
+
+        $(document).bind('keyup', function(event) {
+          if(event.keyCode == 27) {
+            // esc was pressed
+            unloadConsole();
+          } else if(event.keyCode == 13) {
+            // Submit user input and see what happens
+            if(input.val()) {
+              submitQuery(input.val());
+            } else {
+              return false;
+              }
+          } else {
+            // Maybe do something here?
+          }
+        })
+        consoleLoaded = true;
+      }
+
+      function submitQuery(message) {
+        console.log("Submitting query...");
+
+        var $console = $('#console');
+        var $console_viewer = $('#console-viewer');
+
+        $console_viewer.append('<pre>&#8658; ' + $console.val() + '\n</pre>');
+        $console.val('');
+
+        $.ajax({
+          url: "http://localhost:4567",
+          dataType: 'json',
+          data: { 'botid': botid, 'message': message, 'custid': custid },
+          success: function(data) {
+            console.log(data);
+            $console_viewer.append('<pre>' + sanitizeResponse(data.result.that) + '\n</pre>');
+
+            $console_viewer.scrollTop($console_viewer[0].scrollHeight);
+
+            // Set this for subsequent requests
+            custid = data.result.custid;
+          },
+          error: function(description, message) {
+            console.log('An error occurred: ' + description + ': ' + message);
+          }
+        });
+      }
+
+      function sanitizeResponse(string) {
+        // A lot of responses are coming back with multiple spaces
+        // this replaces multiple spaces for just one
+        return string.replace(/\s{2,}/g, ' ');
+      }
+
+      google.setOnLoadCallback(function() {
+        $('body').click(function() {
+          if(consoleLoaded) {
+            $('#console').focus();
+          } else {
+            loadConsole();
+          }
+        })
+      });
+
+      // Analytics
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-25548735-1']);
       _gaq.push(['_setDomainName', 'none']);
@@ -47,19 +170,6 @@
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
-    </script>
-  </head>
-
-  <body>
-    <p>&#77;&#121;&#32;&#110;&#97;&#109;&#101;&#32;&#105;&#115;&#32;&#74;&#111;&#115;&#104;&#32;&#97;&#110;&#100;&#32;&#73;&#32;&#119;&#114;&#105;&#116;&#101;&#32;&#99;&#48;&#100;&#101;&#95;</p>
-
-    <script src="https://www.google.com/jsapi?key=ABQIAAAA6J61Q3NRyblMhP3tunXx5hTXuNJYgRCXxXyfp1wdeUAv4V3EdRSFj_sLW3Z0FtNmgKImSzYeTliOpg" type="text/javascript"></script>
-    <script language="Javascript" type="text/javascript">
-      google.load("jquery", "1.6.4");
-
-      google.setOnLoadCallback(function() {
-        // Add onload callbacks here
-      });
     </script>
   </body>
 </html>
