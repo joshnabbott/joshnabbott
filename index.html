@@ -34,7 +34,12 @@
         vertical-align: middle;
       }
 
-      body span pre {
+      #console-viewer {
+        height: 50%;
+        overflow-y: auto;
+      }
+
+      #console-viewer pre {
         line-height: 100%;
       }
 
@@ -72,7 +77,7 @@
         window.localStorage.setItem('originalContent', $('body').html());
 
         var input = $('<input></input>', { 'type' : 'text', 'name' : 'console', 'id' : 'console' });
-        var viewer = $('<span></span>', { 'id': 'console-viewer' });
+        var viewer = $('<div></div>', { 'id': 'console-viewer' });
 
         input.css({
           'background-color' : 'transparent',
@@ -123,13 +128,23 @@
           data: { 'botid': botid, 'message': message, 'custid': custid },
           success: function(data) {
             console.log(data);
-            $console_viewer.append('<pre>' + data.result.that + '\n</pre>');
+            $console_viewer.append('<pre>' + sanitizeResponse(data.result.that) + '\n</pre>');
+
+            $console_viewer.scrollTop($console_viewer[0].scrollHeight);
+
+            // Set this for subsequent requests
             custid = data.result.custid;
           },
           error: function(description, message) {
             console.log('An error occurred: ' + description + ': ' + message);
           }
         });
+      }
+
+      function sanitizeResponse(string) {
+        // A lot of responses are coming back with multiple spaces
+        // this replaces multiple spaces for just one
+        return string.replace(/\s{2,}/g, ' ');
       }
 
       google.setOnLoadCallback(function() {
