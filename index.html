@@ -7,46 +7,7 @@
 
     <title>&#77;&#121;&#32;&#110;&#97;&#109;&#101;&#32;&#105;&#115;&#32;&#74;&#111;&#115;&#104;&#46;</title>
 
-    <style type="text/css">
-      @font-face {
-        font-family: "Pet Me 2Y";
-        src: url('../fonts/PetMe2Y.ttf') format("truetype");
-      }
-
-      html {
-        height: 100%;
-        overflow: hidden;
-        width: 100%;
-      }
-
-      body {
-        background-color: #111;
-        color: #cacaca;
-        display: table;
-        font-family: "Pet Me 2Y";
-        height: 100%;
-        width: 100%;
-      }
-
-      body p {
-        display: table-cell;
-        text-align: center;
-        vertical-align: middle;
-      }
-
-      #console-viewer {
-        height: 50%;
-        overflow-y: auto;
-      }
-
-      #console-viewer pre {
-        line-height: 100%;
-      }
-
-      input:focus {
-        outline: none;
-      }
-    </style>
+    <link href="public/stylesheets/application.css" rel="stylesheet" type="text/css" />
   </head>
 
   <body>
@@ -135,6 +96,8 @@
 
             // Set this for subsequent requests
             custid = data.result.custid;
+
+            setTimeout(submitQuery('..'), 50000);
           },
           error: function(description, message) {
             console.log('An error occurred: ' + description + ': ' + message);
