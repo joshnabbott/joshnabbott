@@ -24,7 +24,16 @@ body p {
   vertical-align: middle;
 }
 
-body span pre {
+#console-viewer {
+  height: 50%;
+  overflow-y: auto;
+}
+
+#console-viewer pre {
   line-height: 100%;
+}
+
+input:focus {
+  outline: none;
 }
 

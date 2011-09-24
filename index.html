@@ -96,8 +96,6 @@
 
             // Set this for subsequent requests
             custid = data.result.custid;
-
-            setTimeout(submitQuery('..'), 50000);
           },
           error: function(description, message) {
             console.log('An error occurred: ' + description + ': ' + message);
