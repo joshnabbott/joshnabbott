@@ -1,12 +1,16 @@
 var consoleLoaded = false;
+
 // PandoraBots stuff
 var uri    = 'http://pandorabots.heroku.com';
 var botid  = 'ff62f374fe343f73';
-var custid = '';
+var custid = getCache('custid');
 
 
 function unloadConsole() {
-  $('body').html(window.localStorage.getItem('originalContent'));
+  if(!consoleLoaded) return false;
+
+  console.log("Unloading console...");
+  $('body').html(getCache('originalContent'));
   consoleLoaded = false;
 }
 
@@ -16,7 +20,7 @@ function loadConsole() {
   console.log("Loading console...");
 
   // Save original content of page for wheneconsole needs to be quit
-  window.localStorage.setItem('originalContent', $('body').html());
+  setCache('originalContent', $('body').html());
 
   var $input = $('<input></input>', { 'type' : 'text', 'name' : 'console', 'id' : 'console', 'autocomplete' : 'off' });
   var $viewer = $('<div></div>', { 'id': 'console-viewer' });
@@ -39,10 +43,10 @@ function loadConsole() {
   $input.focus();
 
   $(document).bind('keyup', function(event) {
-    if(event.keyCode == 27) {
+    if(event.which == 27) {
       // esc was pressed
       unloadConsole();
-    } else if(event.keyCode == 13) {
+    } else if(event.which == 13) {
       // Submit user input and see what happens
       if($input.val()) {
         submitQuery($input.val());
@@ -70,18 +74,33 @@ function submitQuery(message) {
     dataType: 'json',
     data: { 'botid': botid, 'message': message, 'custid': custid },
     success: function(data) {
-      console.log(data);
-      $console_viewer.append('<pre>' + sanitizeResponse(data.result.that) + '\n</pre>');
-
-      $console_viewer.scrollTop($console_viewer[0].scrollHeight);
-
-      // Set this for subsequent requests
-      custid = data.result.custid;
+      parseData(data);
     },
     error: function(description, message) {
-      console.log('An error occurred: ' + description + ': ' + message);
+      console.log('Blech' + description + ': ' + message);
     }
   });
+
+  function parseData(data) {
+    custid = data.result.custid;
+    setCache('custid', custid);
+
+    var response = '<pre>' + sanitizeResponse(data.result.that) + '\n</pre>';
+
+    $console_viewer.append(response);
+    $console_viewer.scrollTop($console_viewer[0].scrollHeight);
+  }
+}
+
+
+// Wrapper for window.localStorage.getItem(key)
+function getCache(key) {
+  return window.localStorage.getItem(key) || ''
+}
+
+// Wrapper for window.localStorage.setItem(key, data)
+function setCache(key, data) {
+  window.localStorage.setItem(key, data);
 }
 
 function sanitizeResponse(string) {
@@ -89,5 +108,4 @@ function sanitizeResponse(string) {
   // this replaces multiple spaces for just one
   return string.replace(/\s{2,}/g, ' ');
 }
-
 
