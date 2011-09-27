@@ -1,9 +1,7 @@
 Console = {
   loaded: false,
-
   uri: 'http://pandorabots.heroku.com',
   botid: 'ff62f374fe343f73',
-  custid: window.localStorage.getItem('custid') || '',
   responseWrapper: '<pre></pre>',
   $inputStyles: {
     'background-color' : 'transparent',
@@ -23,6 +21,8 @@ Console = {
     if(this.loaded) return false;
 
     console.log('Loading console...');
+
+    this.custid = this.getCache('custid');
 
     this.setCache('originalContent', $('body').html());
 
@@ -91,8 +91,7 @@ Console = {
   },
 
   parseData: function(data) {
-    this.custid = data.result.custid;
-    this.setCache('custid', this.custid);
+    this.setCache('custid', data.result.custid);
 
     var response = $(this.responseWrapper).html(this.sanitizeResponse(data.result.that));
 
