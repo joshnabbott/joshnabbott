@@ -1,31 +1,11 @@
-var consoleLoaded = false;
+Console = {
+  loaded: false,
 
-// PandoraBots stuff
-var uri    = 'http://pandorabots.heroku.com';
-var botid  = 'ff62f374fe343f73';
-var custid = getCache('custid');
-
-
-function unloadConsole() {
-  if(!consoleLoaded) return false;
-
-  console.log("Unloading console...");
-  $('body').html(getCache('originalContent'));
-  consoleLoaded = false;
-}
-
-function loadConsole() {
-  if(consoleLoaded) return false;
-
-  console.log("Loading console...");
-
-  // Save original content of page for wheneconsole needs to be quit
-  setCache('originalContent', $('body').html());
-
-  var $input = $('<input></input>', { 'type' : 'text', 'name' : 'console', 'id' : 'console', 'autocomplete' : 'off' });
-  var $viewer = $('<div></div>', { 'id': 'console-viewer' });
-
-  $input.css({
+  uri: 'http://pandorabots.heroku.com',
+  botid: 'ff62f374fe343f73',
+  custid: window.localStorage.getItem('custid') || '',
+  responseWrapper: '<pre></pre>',
+  $inputStyles: {
     'background-color' : 'transparent',
     'border-width'     : 0,
     'color'            : '#cacaca',
@@ -35,77 +15,116 @@ function loadConsole() {
     'height'           : '14px',
     'vertical-align'   : 'middle',
     'width'            : '100%'
-  });
+  },
 
-  $('body').html($input);
-  $('body').prepend($viewer);
+  load: function() {
+    var self = this;
 
-  $input.focus();
+    if(this.loaded) return false;
 
-  $(document).bind('keyup', function(event) {
-    if(event.which == 27) {
-      // esc was pressed
-      unloadConsole();
-    } else if(event.which == 13) {
-      // Submit user input and see what happens
-      if($input.val()) {
-        submitQuery($input.val());
+    console.log('Loading console...');
+
+    this.setCache('originalContent', $('body').html());
+
+    this.$input  = $('<input></input>', { 'type' : 'text', 'name' : 'console', 'id' : 'console', 'autocomplete' : 'off' });
+    this.$viewer = $('<div></div>', { 'id': 'console-viewer' });
+
+    this.$input.css(this.$inputStyles);
+
+    $('body').html(this.$input);
+    $('body').prepend(this.$viewer);
+
+    this.$input.focus();
+
+    $(document).bind('keyup', function(event) {
+      if(event.which == 27) {
+        // esc was pressed
+        self.unload();
+      } else if(event.which == 13) {
+        // Submit user input and see what happens
+        if(self.$input.val()) {
+          self.submitQuery(self.$input.val());
+        } else {
+          return false;
+        }
       } else {
-        return false;
+        // Maybe do something here?
       }
-    } else {
-      // Maybe do something here?
-    }
-  })
-  consoleLoaded = true;
-}
+    });
 
-function submitQuery(message) {
-  console.log("Submitting query...");
+    // Load the history
+    this.loadHistory();
 
-  var $console = $('#console');
-  var $console_viewer = $('#console-viewer');
+    this.loaded = true;
+  },
 
-  $console_viewer.append('<pre>&#8658; ' + $console.val() + '\n</pre>');
-  $console.val('');
+  unload: function() {
+    if(!this.loaded) return false;
 
-  $.ajax({
-    url: uri,
-    dataType: 'json',
-    data: { 'botid': botid, 'message': message, 'custid': custid },
-    success: function(data) {
-      parseData(data);
-    },
-    error: function(description, message) {
-      console.log('Blech' + description + ': ' + message);
-    }
-  });
+    console.log('Unloading console...');
 
-  function parseData(data) {
-    custid = data.result.custid;
-    setCache('custid', custid);
+    // Set the history for this sessions before unloading
+    this.setCache('history', this.$viewer.html());
+    // Retrieve the original content and set it as the body
+    $('body').html(this.getCache('originalContent'));
+    // Tell Console it's been unloaded
+    this.loaded = false;
+  },
 
-    var response = '<pre>' + sanitizeResponse(data.result.that) + '\n</pre>';
+  submitQuery: function(message) {
+    var self = this;
 
-    $console_viewer.append(response);
-    $console_viewer.scrollTop($console_viewer[0].scrollHeight);
+    this.$viewer.append('<pre>&#8658; ' + message + '</pre>');
+    this.$input.val('');
+
+    $.ajax({
+      url: this.uri,
+      dataType: 'json',
+      data: { 'botid': this.botid, 'message': message, 'custid': this.custid },
+      success: function(data) {
+        self.parseData(data);
+      },
+      error: function(description, message) {
+        console.log('Blech' + description + ': ' + message);
+      }
+    });
+  },
+
+  parseData: function(data) {
+    this.custid = data.result.custid;
+    this.setCache('custid', this.custid);
+
+    var response = $(this.responseWrapper).html(this.sanitizeResponse(data.result.that));
+
+    this.$viewer.append(response);
+    this.positionViewer();
+  },
+
+  getCache: function(key) {
+    return window.localStorage.getItem(key) || '';
+  },
+
+  setCache: function(key, data) {
+    window.localStorage.setItem(key, data);
+  },
+
+  appendCache: function(key, data) {
+    window.localStorage[key] += data;
+  },
+
+  sanitizeResponse: function(dirtyString) {
+    // A lot of responses are coming back with multiple spaces
+    // this replaces multiple spaces for just one
+    return dirtyString.replace(/\s{2,}/g, ' ');
+  },
+
+  positionViewer: function() {
+    this.$viewer.scrollTop(this.$viewer[0].scrollHeight);
+  },
+
+  loadHistory: function() {
+    this.$viewer.html(this.getCache('history'));
+    this.positionViewer();
   }
-}
-
-
-// Wrapper for window.localStorage.getItem(key)
-function getCache(key) {
-  return window.localStorage.getItem(key) || ''
-}
-
-// Wrapper for window.localStorage.setItem(key, data)
-function setCache(key, data) {
-  window.localStorage.setItem(key, data);
-}
-
-function sanitizeResponse(string) {
-  // A lot of responses are coming back with multiple spaces
-  // this replaces multiple spaces for just one
-  return string.replace(/\s{2,}/g, ' ');
 }
 
