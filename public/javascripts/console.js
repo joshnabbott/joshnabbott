@@ -54,6 +54,7 @@ Console = {
 
     // Load the history
     this.loadHistory();
+    this.submitQuery('[greetings]', true);
 
     this.loaded = true;
   },
@@ -71,10 +72,10 @@ Console = {
     this.loaded = false;
   },
 
-  submitQuery: function(message) {
+  submitQuery: function(message, quiet) {
     var self = this;
 
-    this.$viewer.append('<pre>&#8658; ' + message + '</pre>');
+    if(!quiet) this.$viewer.append('<pre>&#8658; ' + message + '</pre>');
     this.$input.val('');
 
     $.ajax({
