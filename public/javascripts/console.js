@@ -92,7 +92,8 @@ Console = {
   },
 
   parseData: function(data) {
-    this.setCache('custid', data.result.custid);
+    this.custid = data.result.custid
+    this.setCache('custid', this.custid);
 
     var response = $(this.responseWrapper).html(this.sanitizeResponse(data.result.that));
 
