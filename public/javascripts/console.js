@@ -27,7 +27,7 @@ Console = {
 
     this.setCache('originalContent', $('body').html());
 
-    this.$input  = $('<input></input>', { 'type' : 'text', 'name' : 'console', 'id' : 'console', 'autocomplete' : 'off' });
+    this.$input  = $('<input></input>', { 'type' : 'text', 'name' : 'console', 'id' : 'console', 'autocomplete' : 'off', 'placeholder' : 'go on, say something...' });
     this.$viewer = $('<div></div>', { 'id': 'console-viewer' });
 
     this.$input.css(this.$inputStyles);
