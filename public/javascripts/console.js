@@ -9,8 +9,9 @@ Console = {
     'color'            : '#cacaca',
     'display'          : 'table-cell',
     'font-family'      : 'inherit',
-    'font-size'        : '14px',
-    'height'           : '14px',
+    'font-size'        : '12px',
+    'height'           : '12px',
+    'padding'          : '0px',
     'vertical-align'   : 'middle',
     'width'            : '100%'
   },
