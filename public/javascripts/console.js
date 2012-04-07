@@ -1,6 +1,6 @@
 Console = {
   loaded: false,
-  uri: 'http://pandorabots.heroku.com',
+  uri: 'http://cold-day-7219.herokuapp.com',
   botid: 'ff62f374fe343f73',
   responseWrapper: '<pre></pre>',
   $inputStyles: {
@@ -54,7 +54,6 @@ Console = {
 
     // Load the history
     this.loadHistory();
-    this.submitQuery('[greetings]', true);
 
     this.loaded = true;
   },
@@ -78,24 +77,17 @@ Console = {
     if(!quiet) this.$viewer.append('<pre>&#8658; ' + message + '</pre>');
     this.$input.val('');
 
-    $.ajax({
-      url: this.uri,
-      dataType: 'json',
-      data: { 'botid': this.botid, 'message': message, 'custid': this.custid },
-      success: function(data) {
-        self.parseData(data);
-      },
-      error: function(description, message) {
-        console.log('Blech' + description + ': ' + message);
-      }
+    $.post(this.uri, { 'botid': this.botid, 'input': message, 'custid': this.custid }, function(data) {
+      self.parseData(data);
     });
   },
 
   parseData: function(data) {
-    this.custid = data.result.custid
+    var json = JSON.parse(data);
+    this.custid = data.customer_id;
     this.setCache('custid', this.custid);
 
-    var response = $(this.responseWrapper).html(this.sanitizeResponse(data.result.that));
+    var response = $(this.responseWrapper).html(this.sanitizeResponse(json.response));
 
     this.$viewer.append(response);
     this.positionViewer();
