@@ -77,14 +77,21 @@ Console = {
     if(!quiet) this.$viewer.append('<pre>&#8658; ' + message + '</pre>');
     this.$input.val('');
 
-    $.post(this.uri, { 'botid': this.botid, 'input': message, 'custid': this.custid }, function(data) {
+    var postParams = {
+      'botid': this.botid,
+      'input': message
+    }
+
+    if (typeof(this.custid) !== 'undefined') postParams.custid = this.custid;
+
+    $.post(this.uri, postParams, function(data) {
       self.parseData(data);
     });
   },
 
   parseData: function(data) {
     var json = JSON.parse(data);
-    this.custid = data.customer_id;
+    this.custid = json.customer_id;
     this.setCache('custid', this.custid);
 
     var response = $(this.responseWrapper).html(this.sanitizeResponse(json.response));
