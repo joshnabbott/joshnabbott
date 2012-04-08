@@ -1,6 +1,6 @@
 Console = {
   loaded: false,
-  uri: 'http://cold-day-7219.herokuapp.com',
+  uri: 'http://pandorabots.herokuapp.com',
   botid: 'ff62f374fe343f73',
   responseWrapper: '<pre></pre>',
   $inputStyles: {
