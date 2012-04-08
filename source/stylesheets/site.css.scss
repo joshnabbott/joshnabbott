@@ -1,0 +1,45 @@
+@import "compass";
+@import "compass/css3/font-face";
+@include font-face("Pet Me 2Y", font-files("/fonts/PetMe2Y.ttf", truetype));
+
+$font-color:  #cacaca;
+$font-family: "Pet Me 2Y";
+$base-font-size:   12px;
+$base-line-height: 18px;
+
+
+html {
+  height: 100%;
+  overflow: hidden;
+  padding: 5px;
+  width: 100%;
+}
+
+body {
+  color: $font-color; 
+  background-color: #111;
+  display: table;
+  font-family: $font-family;
+  height: 100%;
+  width: 100%;
+}
+
+body p {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+#console-viewer {
+  height: 50%;
+  overflow-y: auto;
+
+  pre {
+    line-height: 100%;
+  }
+}
+
+input:focus {
+  outline: none;
+}
+
